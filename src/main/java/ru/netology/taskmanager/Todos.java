@@ -25,9 +25,7 @@ public class Todos {
         for (Task task : tasks) {
             if (task.matches(query)) {
                 Task[] tmp = new Task[result.length + 1];
-                for (int i = 0; i < result.length; i++) {
-                    tmp[i] = result[i];
-                }
+                System.arraycopy(result, 0, tmp, 0, result.length); // Копирование массива
                 tmp[tmp.length - 1] = task;
                 result = tmp;
             }
