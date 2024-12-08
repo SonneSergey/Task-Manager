@@ -1,5 +1,9 @@
 package ru.netology.taskmanager;
+
 import org.junit.jupiter.api.Test;
+
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskManagerTest {
@@ -101,29 +105,28 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void testTaskHashCode() {
-        Task task = new Task(1);
-        assertEquals(java.util.Objects.hash(1), task.hashCode());
-    }
-
-    @Test
-    public void testTaskMatches() {
-        Task task = new Task(1);
-        assertFalse(task.matches("query"));
-    }
-
-    // Добавленные тесты для покрытия строки equals
-    @Test
     public void testTaskEqualsWithNull() {
         Task task = new Task(1);
-        assertFalse(task.equals(null)); // Сравнение с null
+        assertFalse(task.equals(null));
     }
 
     @Test
     public void testTaskEqualsWithDifferentClass() {
         Task task = new Task(1);
-        String otherObject = "Some string";
-        assertFalse(task.equals(otherObject)); // Сравнение с объектом другого класса
+        String other = "Not a Task";
+        assertFalse(task.equals(other));
+    }
+
+    @Test
+    public void testTaskHashCode() {
+        Task task = new Task(1);
+        assertEquals(Objects.hash(1), task.hashCode());
+    }
+
+    @Test
+    public void testTaskMatches() {
+        Task task = new Task(1);
+        assertFalse(task.matches("query")); // Так как метод всегда возвращает false
     }
 
     // Тесты для Todos
@@ -132,7 +135,16 @@ public class TaskManagerTest {
         Todos todos = new Todos();
         SimpleTask task = new SimpleTask(1, "Test Task");
         todos.add(task);
-        assertEquals(1, todos.findAll().length);
+        Task[] result = todos.findAll();
+        assertEquals(1, result.length);
+        assertEquals(task, result[0]);
+    }
+
+    @Test
+    public void testTodosFindAllWhenEmpty() {
+        Todos todos = new Todos();
+        Task[] result = todos.findAll();
+        assertEquals(0, result.length);
     }
 
     @Test
@@ -142,6 +154,7 @@ public class TaskManagerTest {
         todos.add(task);
         Task[] result = todos.search("Test");
         assertEquals(1, result.length);
+        assertEquals(task, result[0]);
     }
 
     @Test
@@ -151,5 +164,18 @@ public class TaskManagerTest {
         todos.add(task);
         Task[] result = todos.search("Nonexistent");
         assertEquals(0, result.length);
+    }
+
+    @Test
+    public void testTodosSearchWithMultipleMatches() {
+        Todos todos = new Todos();
+        SimpleTask task1 = new SimpleTask(1, "Test Task");
+        Epic epic = new Epic(2, new String[]{"Test Subtask"});
+        todos.add(task1);
+        todos.add(epic);
+        Task[] result = todos.search("Test");
+        assertEquals(2, result.length);
+        assertTrue(result[0].matches("Test"));
+        assertTrue(result[1].matches("Test"));
     }
 }
