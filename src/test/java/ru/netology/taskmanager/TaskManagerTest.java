@@ -41,6 +41,12 @@ public class TaskManagerTest {
     }
 
     @Test
+    public void testEpicMatchesWithEmptySubtasks() {
+        Epic epic = new Epic(1, new String[0]);
+        assertFalse(epic.matches("Any"));
+    }
+
+    @Test
     public void testEpicGetSubtasks() {
         Epic epic = new Epic(1, new String[]{"Subtask 1", "Subtask 2"});
         assertArrayEquals(new String[]{"Subtask 1", "Subtask 2"}, epic.getSubtasks());
