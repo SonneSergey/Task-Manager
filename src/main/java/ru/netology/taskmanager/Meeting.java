@@ -1,13 +1,12 @@
 package ru.netology.taskmanager;
 
 public class Meeting extends Task {
+    private String topic;
+    private String project;
+    private String start;
 
-    private String topic;   // Тема встречи
-    private String project; // Проект
-    private String start;   // Дата и время начала
-
-    public Meeting(int id, String topic, String project, String start) { // Конструктор
-        super(id); // Вызов конструктора Task
+    public Meeting(int id, String topic, String project, String start) {
+        super(id);
         this.topic = topic;
         this.project = project;
         this.start = start;
@@ -25,9 +24,12 @@ public class Meeting extends Task {
         return start;
     }
 
-    // Переопределяем метод поиска
     @Override
     public boolean matches(String query) {
-        return topic.contains(query) || project.contains(query); // Поиск в topic и project
+        if (query == null) return false;
+        if (topic != null && topic.contains(query)) {
+            return true;
+        }
+        return project != null && project.contains(query);
     }
 }

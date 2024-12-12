@@ -2,117 +2,113 @@ package ru.netology.taskmanager;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskManagerTest {
 
-    // Тесты для SimpleTask
     @Test
-    public void testSimpleTaskMatchesWithEmptyQuery() {
-        SimpleTask task = new SimpleTask(1, "Test Task");
-        assertFalse(task.matches(""));
-    }
+    public void shouldAddThreeTasksOfDifferentTypes() {
+        SimpleTask simpleTask = new SimpleTask(1, "Позвонить родителям");
 
-    @Test
-    public void testSimpleTaskMatchesWithSpecialCharacters() {
-        SimpleTask task = new SimpleTask(1, "Test Task @2024");
-        assertTrue(task.matches("@2024"));
-    }
+        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
+        Epic epic = new Epic(2, subtasks);
 
-    // Тесты для Epic
-    @Test
-    public void testEpicMatchesWithEmptySubtasks() {
-        Epic epic = new Epic(1, new String[0]);
-        assertFalse(epic.matches("Test"));
-    }
+        Meeting meeting = new Meeting (
+                3,
+                "Выкатка 3-й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда");
 
-    @Test
-    public void testEpicMatchesWithExactSubtask() {
-        Epic epic = new Epic(1, new String[]{"Exact Match"});
-        assertTrue(epic.matches("Exact Match"));
-    }
-
-    @Test
-    public void testEpicGetSubtasksWhenEmpty() {
-        Epic epic = new Epic(1, new String[0]);
-        assertArrayEquals(new String[0], epic.getSubtasks());
-    }
-
-    // Тесты для Meeting
-    @Test
-    public void testMeetingMatchesWithEmptyTopicAndProject() {
-        Meeting meeting = new Meeting(1, "", "", "2024-12-07T10:00");
-        assertFalse(meeting.matches("Test"));
-    }
-
-    @Test
-    public void testMeetingMatchesWithLongQuery() {
-        Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertFalse(meeting.matches("This is a very long query that does not match anything"));
-    }
-
-    // Тесты для Task
-    @Test
-    public void testTaskEqualsWithSameObject() {
-        Task task = new Task(1);
-        assertTrue(task.equals(task));
-    }
-
-    @Test
-    public void testTaskHashCodeWithSameId() {
-        Task task1 = new Task(1);
-        Task task2 = new Task(1);
-        assertEquals(task1.hashCode(), task2.hashCode());
-    }
-
-    // Дополнительные тесты для Todos
-    @Test
-    public void testTodosAddMultipleTasks() {
         Todos todos = new Todos();
-        SimpleTask task1 = new SimpleTask(1, "Task 1");
-        SimpleTask task2 = new SimpleTask(2, "Task 2");
-        todos.add(task1);
-        todos.add(task2);
-        Task[] result = todos.findAll();
-        assertArrayEquals(new Task[]{task1, task2}, result);
+        todos.add(simpleTask);
+        todos.add(epic);
+        todos.add(meeting);
+
+        Task[] expected = {simpleTask, epic, meeting};
+        Task[] actual = todos.findAll();
+
+        assertArrayEquals(expected, actual);
     }
 
     @Test
-    public void testTodosSearchWithEmptyTodos() {
+    public void shouldSearchForTaskByQuery() {
+        SimpleTask simpleTask = new SimpleTask(1, "Позвонить родителям");
+
+        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
+        Epic epic = new Epic(2, subtasks);
+
+        Meeting meeting = new Meeting(
+                3,
+                "Выкатка 3-й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда"
+        );
+
         Todos todos = new Todos();
-        Task[] result = todos.search("Test");
-        assertArrayEquals(new Task[0], result);
+        todos.add(simpleTask);
+        todos.add(epic);
+        todos.add(meeting);
+
+        Task[] expected = {simpleTask, epic};
+        Task[] actual = todos.search("молоко");
+
+        assertArrayEquals(expected, actual);
     }
 
     @Test
-    public void testTodosSearchWithExactMatch() {
+    public void shouldNotSearchForTaskIfQueryIsNull() {
         Todos todos = new Todos();
-        SimpleTask task = new SimpleTask(1, "Exact Match");
-        todos.add(task);
-        Task[] result = todos.search("Exact Match");
-        assertArrayEquals(new Task[]{task}, result);
+        assertThrows(IllegalArgumentException.class, () -> todos.search(null));
     }
 
     @Test
-    public void testTodosAddAndSearchWithSpecialCharacters() {
+    public void shouldSearchMeetingByTopic() {
+        Meeting meeting = new Meeting(3, "Выкатка 3-й версии приложения", "Приложение НетоБанка", "Во вторник после обеда");
         Todos todos = new Todos();
-        SimpleTask task = new SimpleTask(1, "Task with @Special #Characters!");
-        todos.add(task);
-        Task[] result = todos.search("@Special");
-        assertArrayEquals(new Task[]{task}, result);
+        todos.add(meeting);
+        Task[] expected = {meeting};
+        Task[] actual = todos.search("выкатка");
+        assertArrayEquals(expected, actual);
     }
 
     @Test
-    public void testTodosAddDuplicateTasks() {
+    public void shouldNotSearchIfNoMatch() {
+        SimpleTask simpleTask = new SimpleTask(1, "Позвонить родителям");
         Todos todos = new Todos();
-        SimpleTask task = new SimpleTask(1, "Duplicate Task");
-        todos.add(task);
-        todos.add(task);
-        Task[] result = todos.findAll();
-        assertEquals(2, result.length);
-        assertEquals(task, result[0]);
-        assertEquals(task, result[1]);
+        todos.add(simpleTask);
+        Task[] expected = {};
+        Task[] actual = todos.search("не существует");
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldSearchEpicSubtasksByQuery() {
+        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
+        Epic epic = new Epic(2, subtasks);
+        Todos todos = new Todos();
+        todos.add(epic);
+        Task[] expected = {epic};
+        Task[] actual = todos.search("хлеб");
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldSearchMeetingByDate() {
+        Meeting meeting = new Meeting(3, "Выкатка 3-й версии приложения", "НетоБанк", "Во вторник после обеда");
+        Todos todos = new Todos();
+        todos.add(meeting);
+        Task[] expected = {meeting};
+        Task[] actual = todos.search("вторник");
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldSearchMeetingByProject() {
+        Meeting meeting = new Meeting(3, "Выкатка 3-й версии приложения", "НетоБанк", "Во вторник после обеда");
+        Todos todos = new Todos();
+        todos.add(meeting);
+        Task[] expected = {meeting};
+        Task[] actual = todos.search("НетоБанк");
+        assertArrayEquals(expected, actual);
     }
 }

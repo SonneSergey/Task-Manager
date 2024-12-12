@@ -1,18 +1,18 @@
 package ru.netology.taskmanager;
 
+import java.util.Objects;
+
 public class Task {
+    protected int id;
 
-    protected int id; // Уникальный идентификатор задачи
-
-    public Task(int id) { // Конструктор класса
+    public Task(int id) {
         this.id = id;
     }
 
-    public int getId() { // Геттер для id
+    public int getId() {
         return id;
     }
 
-    // Метод для сравнения задач
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -21,14 +21,12 @@ public class Task {
         return id == task.id;
     }
 
-    // Хэш-код для сравнения объектов
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id); // Полный путь к Objects
+        return Objects.hash(id);
     }
 
-    // Метод для поиска задачи
     public boolean matches(String query) {
-        return false;
+        return false; // Логика поиска (по умолчанию ничего не находит)
     }
 }

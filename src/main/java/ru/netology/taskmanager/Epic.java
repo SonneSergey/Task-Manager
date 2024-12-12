@@ -1,23 +1,22 @@
 package ru.netology.taskmanager;
 
 public class Epic extends Task {
+    private String[] subtasks;
 
-    private String[] subtasks; // Массив подзадач
-
-    public Epic(int id, String[] subtasks) { // Конструктор
-        super(id); // Вызов конструктора из базового класса Task
+    public Epic(int id, String[] subtasks) {
+        super(id);
         this.subtasks = subtasks;
     }
 
-    public String[] getSubtasks() { // Геттер для подзадач
+    public String[] getSubtasks() {
         return subtasks;
     }
 
-    // Переопределяем метод поиска
     @Override
     public boolean matches(String query) {
-        for (String subtask : subtasks) { // Перебираем подзадачи
-            if (subtask.contains(query)) { // Если query есть в подзадаче
+        if (query == null || subtasks == null) return false;
+        for (String subtask : subtasks) {
+            if (subtask != null && subtask.contains(query)) {
                 return true;
             }
         }

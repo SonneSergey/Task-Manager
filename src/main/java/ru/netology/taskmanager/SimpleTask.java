@@ -1,21 +1,20 @@
 package ru.netology.taskmanager;
 
 public class SimpleTask extends Task {
+    private String title;
 
-    protected String title; // Название задачи
-
-    public SimpleTask(int id, String title) { // Конструктор
-        super(id); // Вызов конструктора из класса Task
+    public SimpleTask(int id, String title) {
+        super(id);
         this.title = title;
     }
 
-    public String getTitle() { // Геттер для названия
+    public String getTitle() {
         return title;
     }
 
-    // Переопределяем метод поиска
     @Override
     public boolean matches(String query) {
-        return title.contains(query); // Возвращает true, если query есть в title
+        if (query == null) return false;
+        return title != null && title.contains(query);
     }
 }
