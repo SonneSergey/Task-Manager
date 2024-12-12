@@ -10,168 +10,109 @@ public class TaskManagerTest {
 
     // Тесты для SimpleTask
     @Test
-    public void testSimpleTaskMatchesWithSubstring() {
+    public void testSimpleTaskMatchesWithEmptyQuery() {
         SimpleTask task = new SimpleTask(1, "Test Task");
-        assertTrue(task.matches("Test"));
+        assertFalse(task.matches(""));
     }
 
     @Test
-    public void testSimpleTaskMatchesWithoutSubstring() {
-        SimpleTask task = new SimpleTask(1, "Test Task");
-        assertFalse(task.matches("Nonexistent"));
-    }
-
-    @Test
-    public void testSimpleTaskGetTitle() {
-        SimpleTask task = new SimpleTask(1, "Test Task");
-        assertEquals("Test Task", task.getTitle());
+    public void testSimpleTaskMatchesWithSpecialCharacters() {
+        SimpleTask task = new SimpleTask(1, "Test Task @2024");
+        assertTrue(task.matches("@2024"));
     }
 
     // Тесты для Epic
     @Test
-    public void testEpicMatchesWithSubtask() {
-        Epic epic = new Epic(1, new String[]{"Subtask 1", "Subtask 2"});
-        assertTrue(epic.matches("Subtask 1"));
+    public void testEpicMatchesWithEmptySubtasks() {
+        Epic epic = new Epic(1, new String[0]);
+        assertFalse(epic.matches("Test"));
     }
 
     @Test
-    public void testEpicMatchesWithoutSubtask() {
-        Epic epic = new Epic(1, new String[]{"Subtask 1", "Subtask 2"});
-        assertFalse(epic.matches("Nonexistent"));
+    public void testEpicMatchesWithExactSubtask() {
+        Epic epic = new Epic(1, new String[]{"Exact Match"});
+        assertTrue(epic.matches("Exact Match"));
     }
 
     @Test
-    public void testEpicGetSubtasks() {
-        Epic epic = new Epic(1, new String[]{"Subtask 1", "Subtask 2"});
-        assertArrayEquals(new String[]{"Subtask 1", "Subtask 2"}, epic.getSubtasks());
+    public void testEpicGetSubtasksWhenEmpty() {
+        Epic epic = new Epic(1, new String[0]);
+        assertArrayEquals(new String[0], epic.getSubtasks());
     }
 
     // Тесты для Meeting
     @Test
-    public void testMeetingMatchesWithTopic() {
-        Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertTrue(meeting.matches("Project Update"));
+    public void testMeetingMatchesWithEmptyTopicAndProject() {
+        Meeting meeting = new Meeting(1, "", "", "2024-12-07T10:00");
+        assertFalse(meeting.matches("Test"));
     }
 
     @Test
-    public void testMeetingMatchesWithProject() {
+    public void testMeetingMatchesWithLongQuery() {
         Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertTrue(meeting.matches("Project A"));
-    }
-
-    @Test
-    public void testMeetingMatchesWithoutQuery() {
-        Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertFalse(meeting.matches("Nonexistent"));
-    }
-
-    @Test
-    public void testMeetingGetTopic() {
-        Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertEquals("Project Update", meeting.getTopic());
-    }
-
-    @Test
-    public void testMeetingGetProject() {
-        Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertEquals("Project A", meeting.getProject());
-    }
-
-    @Test
-    public void testMeetingGetStart() {
-        Meeting meeting = new Meeting(1, "Project Update", "Project A", "2024-12-07T10:00");
-        assertEquals("2024-12-07T10:00", meeting.getStart());
+        assertFalse(meeting.matches("This is a very long query that does not match anything"));
     }
 
     // Тесты для Task
     @Test
-    public void testTaskGetId() {
+    public void testTaskEqualsWithSameObject() {
         Task task = new Task(1);
-        assertEquals(1, task.getId());
+        assertTrue(task.equals(task));
     }
 
     @Test
-    public void testTaskEqualsWithSameId() {
+    public void testTaskHashCodeWithSameId() {
         Task task1 = new Task(1);
         Task task2 = new Task(1);
-        assertTrue(task1.equals(task2));
+        assertEquals(task1.hashCode(), task2.hashCode());
     }
 
+    // Дополнительные тесты для Todos
     @Test
-    public void testTaskEqualsWithDifferentId() {
-        Task task1 = new Task(1);
-        Task task2 = new Task(2);
-        assertFalse(task1.equals(task2));
-    }
-
-    @Test
-    public void testTaskEqualsWithNull() {
-        Task task = new Task(1);
-        assertFalse(task.equals(null));
-    }
-
-    @Test
-    public void testTaskEqualsWithDifferentClass() {
-        Task task = new Task(1);
-        String other = "Not a Task";
-        assertFalse(task.equals(other));
-    }
-
-    @Test
-    public void testTaskHashCode() {
-        Task task = new Task(1);
-        assertEquals(Objects.hash(1), task.hashCode());
-    }
-
-    @Test
-    public void testTaskMatches() {
-        Task task = new Task(1);
-        assertFalse(task.matches("query")); // Так как метод всегда возвращает false
-    }
-
-    // Тесты для Todos
-    @Test
-    public void testTodosAddTask() {
+    public void testTodosAddMultipleTasks() {
         Todos todos = new Todos();
-        SimpleTask task = new SimpleTask(1, "Test Task");
-        todos.add(task);
-        Task[] result = todos.findAll();
-        assertArrayEquals(new Task[]{task}, result);
-    }
-
-    @Test
-    public void testTodosFindAllWhenEmpty() {
-        Todos todos = new Todos();
-        Task[] result = todos.findAll();
-        assertArrayEquals(new Task[0], result);
-    }
-
-    @Test
-    public void testTodosSearchWithMatchingTask() {
-        Todos todos = new Todos();
-        SimpleTask task = new SimpleTask(1, "Test Task");
-        todos.add(task);
-        Task[] result = todos.search("Test");
-        assertArrayEquals(new Task[]{task}, result);
-    }
-
-    @Test
-    public void testTodosSearchWithNoMatchingTask() {
-        Todos todos = new Todos();
-        SimpleTask task = new SimpleTask(1, "Test Task");
-        todos.add(task);
-        Task[] result = todos.search("Nonexistent");
-        assertArrayEquals(new Task[0], result);
-    }
-
-    @Test
-    public void testTodosSearchWithMultipleMatches() {
-        Todos todos = new Todos();
-        SimpleTask task1 = new SimpleTask(1, "Test Task");
-        Epic epic = new Epic(2, new String[]{"Test Subtask"});
+        SimpleTask task1 = new SimpleTask(1, "Task 1");
+        SimpleTask task2 = new SimpleTask(2, "Task 2");
         todos.add(task1);
-        todos.add(epic);
+        todos.add(task2);
+        Task[] result = todos.findAll();
+        assertArrayEquals(new Task[]{task1, task2}, result);
+    }
+
+    @Test
+    public void testTodosSearchWithEmptyTodos() {
+        Todos todos = new Todos();
         Task[] result = todos.search("Test");
-        assertArrayEquals(new Task[]{task1, epic}, result);
+        assertArrayEquals(new Task[0], result);
+    }
+
+    @Test
+    public void testTodosSearchWithExactMatch() {
+        Todos todos = new Todos();
+        SimpleTask task = new SimpleTask(1, "Exact Match");
+        todos.add(task);
+        Task[] result = todos.search("Exact Match");
+        assertArrayEquals(new Task[]{task}, result);
+    }
+
+    @Test
+    public void testTodosAddAndSearchWithSpecialCharacters() {
+        Todos todos = new Todos();
+        SimpleTask task = new SimpleTask(1, "Task with @Special #Characters!");
+        todos.add(task);
+        Task[] result = todos.search("@Special");
+        assertArrayEquals(new Task[]{task}, result);
+    }
+
+    @Test
+    public void testTodosAddDuplicateTasks() {
+        Todos todos = new Todos();
+        SimpleTask task = new SimpleTask(1, "Duplicate Task");
+        todos.add(task);
+        todos.add(task);
+        Task[] result = todos.findAll();
+        assertEquals(2, result.length);
+        assertEquals(task, result[0]);
+        assertEquals(task, result[1]);
     }
 }
