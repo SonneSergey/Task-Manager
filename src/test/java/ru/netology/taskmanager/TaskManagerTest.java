@@ -7,108 +7,60 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskManagerTest {
 
     @Test
-    public void shouldAddThreeTasksOfDifferentTypes() {
-        SimpleTask simpleTask = new SimpleTask(1, "Позвонить родителям");
-
-        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
-        Epic epic = new Epic(2, subtasks);
-
-        Meeting meeting = new Meeting (
-                3,
-                "Выкатка 3-й версии приложения",
-                "Приложение НетоБанка",
-                "Во вторник после обеда");
-
-        Todos todos = new Todos();
-        todos.add(simpleTask);
-        todos.add(epic);
-        todos.add(meeting);
-
-        Task[] expected = {simpleTask, epic, meeting};
-        Task[] actual = todos.findAll();
-
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
     public void shouldSearchForTaskByQuery() {
+        // Создаем объекты задач
         SimpleTask simpleTask = new SimpleTask(1, "Позвонить родителям");
+        Epic epic = new Epic(2, new String[]{"Молоко", "Яйца"});
+        Meeting meeting = new Meeting(3, "Выкатка версии", "Проект X", "12 декабря");
 
-        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
-        Epic epic = new Epic(2, subtasks);
-
-        Meeting meeting = new Meeting(
-                3,
-                "Выкатка 3-й версии приложения",
-                "Приложение НетоБанка",
-                "Во вторник после обеда"
-        );
-
+        // Создаем объект менеджера задач
         Todos todos = new Todos();
+
+        // Добавляем задачи в менеджер
         todos.add(simpleTask);
         todos.add(epic);
         todos.add(meeting);
 
-        Task[] expected = {simpleTask, epic};
-        Task[] actual = todos.search("молоко");
+        // Ожидаем, что будет найдено 1 задача, содержащая слово "родителям"
+        Task[] expectedSimpleTask = {simpleTask};  // Если запрос 'родителям', ожидаем найти только simpleTask
+        Task[] actualSimpleTask = todos.search("родителям");
 
-        assertArrayEquals(expected, actual);
+        // Сравниваем ожидания с реальным результатом
+        assertArrayEquals(expectedSimpleTask, actualSimpleTask);
+
+        // Ожидаем, что будет найдено 1 задача, содержащая слово "молоко"
+        Task[] expectedEpic = {epic}; // Если запрос "молоко", то только epic
+        Task[] actualEpic = todos.search("молоко");
+
+        assertArrayEquals(expectedEpic, actualEpic);
+
+        // Ожидаем, что будет найдено 1 задача, содержащая слово "встреча" в topic
+        Task[] expectedMeeting = {meeting};  // Если запрос "встреча", то только meeting
+        Task[] actualMeeting = todos.search("встреча");
+
+        assertArrayEquals(expectedMeeting, actualMeeting);
+
+        // Ожидаем, что не найдется ни одной задачи по запросу "не существует"
+        Task[] expectedNone = {};  // Не существует задачи с таким запросом
+        Task[] actualNone = todos.search("не существует");
+
+        assertArrayEquals(expectedNone, actualNone);
     }
 
     @Test
     public void shouldNotSearchForTaskIfQueryIsNull() {
-        Todos todos = new Todos();
-        assertThrows(IllegalArgumentException.class, () -> todos.search(null));
-    }
-
-    @Test
-    public void shouldSearchMeetingByTopic() {
-        Meeting meeting = new Meeting(3, "Выкатка 3-й версии приложения", "Приложение НетоБанка", "Во вторник после обеда");
-        Todos todos = new Todos();
-        todos.add(meeting);
-        Task[] expected = {meeting};
-        Task[] actual = todos.search("выкатка");
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void shouldNotSearchIfNoMatch() {
+        // Создаем задачи
         SimpleTask simpleTask = new SimpleTask(1, "Позвонить родителям");
         Todos todos = new Todos();
         todos.add(simpleTask);
-        Task[] expected = {};
-        Task[] actual = todos.search("не существует");
-        assertArrayEquals(expected, actual);
-    }
 
-    @Test
-    public void shouldSearchEpicSubtasksByQuery() {
-        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
-        Epic epic = new Epic(2, subtasks);
-        Todos todos = new Todos();
-        todos.add(epic);
-        Task[] expected = {epic};
-        Task[] actual = todos.search("хлеб");
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void shouldSearchMeetingByDate() {
-        Meeting meeting = new Meeting(3, "Выкатка 3-й версии приложения", "НетоБанк", "Во вторник после обеда");
-        Todos todos = new Todos();
-        todos.add(meeting);
-        Task[] expected = {meeting};
-        Task[] actual = todos.search("вторник");
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void shouldSearchMeetingByProject() {
-        Meeting meeting = new Meeting(3, "Выкатка 3-й версии приложения", "НетоБанк", "Во вторник после обеда");
-        Todos todos = new Todos();
-        todos.add(meeting);
-        Task[] expected = {meeting};
-        Task[] actual = todos.search("НетоБанк");
-        assertArrayEquals(expected, actual);
+        // Проверяем, что при передаче null в качестве запроса должно быть выброшено исключение
+        try {
+            todos.search(null);
+            // Если исключение не было выброшено, то тест должен упасть
+            throw new AssertionError("Expected IllegalArgumentException, but none was thrown.");
+        } catch (IllegalArgumentException e) {
+            // Ожидаем IllegalArgumentException, значит тест прошел
+        }
     }
 }

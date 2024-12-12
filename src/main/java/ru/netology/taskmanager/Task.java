@@ -2,7 +2,7 @@ package ru.netology.taskmanager;
 
 import java.util.Objects;
 
-public class Task {
+public abstract class Task {
     protected int id;
 
     public Task(int id) {
@@ -13,6 +13,7 @@ public class Task {
         return id;
     }
 
+    // Переопределенные методы equals и hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -26,7 +27,6 @@ public class Task {
         return Objects.hash(id);
     }
 
-    public boolean matches(String query) {
-        return false; // Логика поиска (по умолчанию ничего не находит)
-    }
+    // Абстрактный метод, переопределяемый в наследниках
+    public abstract boolean matches(String query);
 }

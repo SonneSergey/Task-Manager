@@ -14,7 +14,7 @@ public class Epic extends Task {
 
     @Override
     public boolean matches(String query) {
-        if (query == null || subtasks == null) return false;
+        if (subtasks == null) return false;
         for (String subtask : subtasks) {
             if (subtask != null && subtask.contains(query)) {
                 return true;
