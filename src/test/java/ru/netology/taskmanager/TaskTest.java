@@ -74,4 +74,16 @@ public class TaskTest {
 
         assertTrue(task.equals(task)); // Сравниваем объект с самим собой — равны
     }
+
+    @Test
+    public void shouldReturnTrueWhenTaskMatchesQuery() {
+        Task task = new SimpleTask(1, "Позвонить родителям");
+        assertTrue(task.matches("Позвонить")); // Строка "Позвонить" должна совпасть с задачей
+    }
+
+    @Test
+    public void shouldReturnFalseWhenTaskDoesNotMatchQuery() {
+        Task task = new SimpleTask(1, "Позвонить родителям");
+        assertFalse(task.matches("Позвонить друзьям")); // Строка "Позвонить друзей" не должна совпасть
+    }
 }

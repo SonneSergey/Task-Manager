@@ -1,6 +1,5 @@
 package ru.netology.taskmanager;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +28,7 @@ public class TaskTodosTest {
 
         Task[] expected = {simpleTask, epic, meeting};
         Task[] actual = todos.findAll();
-        Assertions.assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
@@ -41,7 +40,7 @@ public class TaskTodosTest {
         Task[] expected = {simpleTask};
         Task[] actual = todos.search("Позвонить");
 
-        Assertions.assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
@@ -54,7 +53,7 @@ public class TaskTodosTest {
         Task[] expected = {epic};
         Task[] actual = todos.search("Яйца");
 
-        Assertions.assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
@@ -71,7 +70,7 @@ public class TaskTodosTest {
         Task[] expected = {meeting};
         Task[] actual = todos.search("Выкатка");
 
-        Assertions.assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
@@ -83,13 +82,13 @@ public class TaskTodosTest {
         Task[] expected = {};
         Task[] actual = todos.search("Неизвестный запрос");
 
-        Assertions.assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
     public void shouldThrowExceptionWhenQueryIsNull() {
         Todos todos = new Todos();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             todos.search(null);
         });
     }
@@ -101,7 +100,7 @@ public class TaskTodosTest {
         Task[] expected = {};
         Task[] actual = todos.search("Любой запрос");
 
-        Assertions.assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, actual);
     }
 
     // Тесты для методов get...
@@ -141,5 +140,34 @@ public class TaskTodosTest {
     public void shouldReturnCorrectIdForTask() {
         Task task = new SimpleTask(1, "Позвонить родителям");
         assertEquals(1, task.getId());
+    }
+
+    @Test
+    public void shouldMatchMeetingByProject() {
+        Meeting meeting = new Meeting(
+                555,
+                "Выкатка 3й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда"
+        );
+        assertTrue(meeting.matches("Приложение НетоБанка"));  // Проверка совпадения с проектом
+    }
+
+    @Test
+    public void shouldNotMatchMeetingByWrongProject() {
+        Meeting meeting = new Meeting(
+                555,
+                "Выкатка 3й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда"
+        );
+        assertFalse(meeting.matches("Неверный проект")); // Проверка на отсутствие совпадений
+    }
+
+    @Test
+    public void shouldNotMatchEpicByQuery() {
+        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
+        Epic epic = new Epic(55, subtasks);
+        assertFalse(epic.matches("Неверный подзадача"));  // Не должно совпасть с подзадачей
     }
 }
