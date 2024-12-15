@@ -1,5 +1,4 @@
 package ru.netology.taskmanager;
-
 public class Meeting extends Task {
     private String topic;
     private String project;

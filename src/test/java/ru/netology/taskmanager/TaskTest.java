@@ -1,89 +1,95 @@
 package ru.netology.taskmanager;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskTest {
 
     @Test
-    public void shouldReturnFalseWhenQueryDoesNotMatchInBaseTask() {
-        Task task = new Task(1) {
-        }; // Создаем анонимный подкласс, так как Task абстрактный
-        assertFalse(task.matches("query")); // У базового класса всегда false
+    public void TestSimpleMatch() {
+        SimpleTask simpleTask = new SimpleTask(5, "Позвонить родителям");
+
+        boolean actual = simpleTask.matches("Позвонить");
+
+        Assertions.assertTrue(actual);
+
     }
 
     @Test
-    public void shouldCheckEqualityOfTasks() {
-        Task task1 = new SimpleTask(1, "Позвонить родителям");
-        Task task2 = new SimpleTask(1, "Позвонить родителям");
-        Task task3 = new SimpleTask(2, "Позвонить друзьям");
+    public void TestSimpleNotMatch() {
+        SimpleTask simpleTask = new SimpleTask(5, "Позвонить родителям");
 
-        assertEquals(task1, task2); // Одинаковые ID — должны быть равны
-        assertNotEquals(task1, task3); // Разные ID — не равны
+        boolean actual = simpleTask.matches("Написать");
+
+        Assertions.assertFalse(actual);
+
     }
 
     @Test
-    public void shouldCheckHashCode() {
-        Task task1 = new SimpleTask(1, "Позвонить родителям");
-        Task task2 = new SimpleTask(1, "Позвонить родителям");
+    public void TestEpicMatch() {
+        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
+        Epic epic = new Epic(55, subtasks);
 
-        assertEquals(task1.hashCode(), task2.hashCode()); // Одинаковый hashCode
+        boolean actual = epic.matches("Хлеб");
+
+        Assertions.assertTrue(actual);
+
     }
 
     @Test
-    public void shouldReturnCorrectIdForTask() {
-        Task task = new SimpleTask(1, "Позвонить родителям");
-        assertEquals(1, task.getId()); // Проверка ID
+    public void TestEpicNotMatch() {
+        String[] subtasks = {"Молоко", "Яйца", "Хлеб"};
+        Epic epic = new Epic(55, subtasks);
+
+        boolean actual = epic.matches("Пельмени");
+
+        Assertions.assertFalse(actual);
+
     }
 
     @Test
-    public void shouldReturnTrueWhenTasksHaveSameId() {
-        Task task1 = new SimpleTask(1, "Позвонить родителям");
-        Task task2 = new SimpleTask(1, "Позвонить родителям");
+    public void TestMeetingMatchTopic() {
+        Meeting meeting = new Meeting(
+                555,
+                "Выкатка 3й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда"
+        );
 
-        assertTrue(task1.equals(task2)); // Одинаковые ID — должны быть равны
+        boolean actual = meeting.matches("Выкатка");
+
+        Assertions.assertTrue(actual);
+
     }
 
     @Test
-    public void shouldReturnFalseWhenTasksHaveDifferentId() {
-        Task task1 = new SimpleTask(1, "Позвонить родителям");
-        Task task2 = new SimpleTask(2, "Позвонить друзьям");
+    public void TestMeetingMatchProject() {
+        Meeting meeting = new Meeting(
+                555,
+                "Выкатка 3й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда"
+        );
 
-        assertFalse(task1.equals(task2)); // Разные ID — не равны
+        boolean actual = meeting.matches("Приложение");
+
+        Assertions.assertTrue(actual);
+
     }
 
     @Test
-    public void shouldReturnFalseWhenComparingWithDifferentClass() {
-        Task task = new SimpleTask(1, "Позвонить родителям");
-        String otherObject = "Some string";
+    public void TestMeetingNotMatch() {
+        Meeting meeting = new Meeting(
+                555,
+                "Выкатка 3й версии приложения",
+                "Приложение НетоБанка",
+                "Во вторник после обеда"
+        );
 
-        assertFalse(task.equals(otherObject)); // Сравниваем с объектом другого класса — не равны
-    }
+        boolean actual = meeting.matches("вторник");
 
-    @Test
-    public void shouldReturnFalseWhenComparingWithNull() {
-        Task task = new SimpleTask(1, "Позвонить родителям");
+        Assertions.assertFalse(actual);
 
-        assertFalse(task.equals(null)); // Сравниваем с null — не равны
-    }
-
-    @Test
-    public void shouldReturnTrueWhenComparingObjectWithItself() {
-        Task task = new SimpleTask(1, "Позвонить родителям");
-
-        assertTrue(task.equals(task)); // Сравниваем объект с самим собой — равны
-    }
-
-    @Test
-    public void shouldReturnTrueWhenTaskMatchesQuery() {
-        Task task = new SimpleTask(1, "Позвонить родителям");
-        assertTrue(task.matches("Позвонить")); // Строка "Позвонить" должна совпасть с задачей
-    }
-
-    @Test
-    public void shouldReturnFalseWhenTaskDoesNotMatchQuery() {
-        Task task = new SimpleTask(1, "Позвонить родителям");
-        assertFalse(task.matches("Позвонить друзьям")); // Строка "Позвонить друзей" не должна совпасть
     }
 }

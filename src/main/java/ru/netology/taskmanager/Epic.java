@@ -1,5 +1,4 @@
 package ru.netology.taskmanager;
-
 public class Epic extends Task {
     private String[] subtasks;
 
@@ -14,7 +13,6 @@ public class Epic extends Task {
 
     @Override
     public boolean matches(String query) {
-
         for (String subtask : subtasks) {
             if (subtask.contains(query)) {
                 return true;
