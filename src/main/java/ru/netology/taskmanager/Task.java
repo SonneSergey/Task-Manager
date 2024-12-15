@@ -27,6 +27,7 @@ public abstract class Task {
         return Objects.hash(id);
     }
 
-    // Абстрактный метод, переопределяемый в наследниках
-    public abstract boolean matches(String query);
+    public boolean matches(String query) {
+        return false;
+    }
 }
